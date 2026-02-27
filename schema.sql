@@ -62,6 +62,35 @@ CREATE TABLE IF NOT EXISTS user_credit_claims (
     UNIQUE(user_id, claim_date)
 );
 
+CREATE TABLE IF NOT EXISTS user_proxies (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    name VARCHAR(255),
+    host VARCHAR(255) NOT NULL,
+    port INTEGER NOT NULL,
+    username VARCHAR(255),
+    password VARCHAR(255),
+    ptype VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, host, port)
+);
+
+CREATE TABLE IF NOT EXISTS redeemcodes (
+    id SERIAL PRIMARY KEY,
+    code VARCHAR(64) UNIQUE NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    credits INTEGER DEFAULT 0,
+    plan_name VARCHAR(50),
+    plan_days INTEGER DEFAULT 0,
+    max_uses INTEGER DEFAULT 1,
+    used_count INTEGER DEFAULT 0,
+    redeemed_by INTEGER REFERENCES users(id),
+    created_by INTEGER REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    redeemed_at TIMESTAMP,
+    expires_at TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS settings (
     key VARCHAR(64) PRIMARY KEY,
     val TEXT,
@@ -72,3 +101,6 @@ CREATE INDEX IF NOT EXISTS idx_users_telegram_id ON users(telegram_id);
 CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
 CREATE INDEX IF NOT EXISTS idx_redeem_codes_code ON redeem_codes(code);
 CREATE INDEX IF NOT EXISTS idx_redeem_history_user_id ON redeem_history(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_proxies_user_id ON user_proxies(user_id);
+CREATE INDEX IF NOT EXISTS idx_redeemcodes_code ON redeemcodes(code);
+CREATE INDEX IF NOT EXISTS idx_user_credit_claims_user_date ON user_credit_claims(user_id, claim_date);

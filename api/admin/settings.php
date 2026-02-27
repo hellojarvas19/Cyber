@@ -16,8 +16,8 @@ if (($st->fetchColumn() ?? '') !== 'admin') { http_response_code(403); echo json
  * Simple key-value settings table:
  * CREATE TABLE settings ( `key` varchar(64) PRIMARY KEY, `val` text, `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP );
  */
-function setKV(PDO $pdo, string $k, string $v){ $s=$pdo->prepare("INSERT INTO settings(`key`,`val`) VALUES(:k,:v) ON DUPLICATE KEY UPDATE val=VALUES(val)"); $s->execute([':k'=>$k,':v'=>$v]); }
-function getKV(PDO $pdo, string $k, $def=''){ $s=$pdo->prepare("SELECT val FROM settings WHERE `key`=:k"); $s->execute([':k'=>$k]); $v=$s->fetchColumn(); return $v!==false?$v:$def; }
+function setKV(PDO $pdo, string $k, string $v){ $s=$pdo->prepare("INSERT INTO settings(key,val) VALUES(:k,:v) ON CONFLICT (key) DO UPDATE SET val = EXCLUDED.val"); $s->execute([':k'=>$k,':v'=>$v]); }
+function getKV(PDO $pdo, string $k, $def=''){ $s=$pdo->prepare("SELECT val FROM settings WHERE key=:k"); $s->execute([':k'=>$k]); $v=$s->fetchColumn(); return $v!==false?$v:$def; }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   setKV($pdo,'brand',          (string)($_POST['brand'] ?? 'CyborX'));

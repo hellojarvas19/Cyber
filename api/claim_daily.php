@@ -62,8 +62,9 @@ try {
   $pdo->beginTransaction();
 
   // একই দিনে একবারই ইনসার্ট হবে (UNIQUE index দরকার; নিচে নোট দেখুন)
-  $ins = $pdo->prepare("INSERT IGNORE INTO user_credit_claims (user_id, claim_date, amount, created_at)
-                        VALUES (:u, :d, :a, NOW())");
+  $ins = $pdo->prepare("INSERT INTO user_credit_claims (user_id, claim_date, amount, created_at)
+                        VALUES (:u, :d, :a, NOW())
+                        ON CONFLICT (user_id, claim_date) DO NOTHING");
   $ins->execute([':u'=>$uid, ':d'=>$today, ':a'=>$amount]);
 
   if ($ins->rowCount() === 0) {

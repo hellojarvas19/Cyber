@@ -58,9 +58,9 @@ if ($fn === 'add' && $_SERVER['REQUEST_METHOD']==='POST') {
   if ($cur >= USER_PROXY_LIMIT) j(false, ['error'=>'LIMIT','limit'=>USER_PROXY_LIMIT]);
 
   $stmt = $pdo->prepare("INSERT INTO user_proxies
-      (user_id, name, host, port, username, password, ptype, status, created_at)
-      VALUES (:uid, :name, :host, :port, NULLIF(:u,''), NULLIF(:p,''), :t, 'testing', NOW())
-      ON DUPLICATE KEY UPDATE name=VALUES(name)");
+      (user_id, name, host, port, username, password, ptype, created_at)
+      VALUES (:uid, :name, :host, :port, NULLIF(:u,''), NULLIF(:p,''), :t, NOW())
+      ON CONFLICT (user_id, host, port) DO UPDATE SET name = EXCLUDED.name");
   $ok = $stmt->execute([
     ':uid'=>$uid, ':name'=>$name, ':host'=>$host, ':port'=>$port,
     ':u'=>$user, ':p'=>$pass, ':t'=>$type
@@ -81,14 +81,14 @@ if ($fn === 'import' && $_SERVER['REQUEST_METHOD']==='POST') {
   if ($left <= 0) j(false, ['error'=>'LIMIT','limit'=>USER_PROXY_LIMIT]);
 
   // Find current max Bulk-N for this user
-  $maxQ = $pdo->prepare("SELECT MAX(CAST(SUBSTRING(name,6) AS UNSIGNED)) AS mx FROM user_proxies WHERE user_id=:u AND name LIKE 'Bulk-%'");
+  $maxQ = $pdo->prepare("SELECT MAX(CAST(SUBSTRING(name FROM 6) AS INTEGER)) AS mx FROM user_proxies WHERE user_id=:u AND name LIKE 'Bulk-%'");
   $maxQ->execute([':u'=>$uid]);
   $counter = (int)($maxQ->fetchColumn() ?: 0);
 
   $pdo->beginTransaction();
-  $stmt = $pdo->prepare("INSERT INTO user_proxies (user_id,name,host,port,username,password,ptype,status,created_at)
-    VALUES (:uid,:name,:host,:port, NULLIF(:u,''), NULLIF(:p,''), :t,'testing',NOW())
-    ON DUPLICATE KEY UPDATE name=VALUES(name)");
+  $stmt = $pdo->prepare("INSERT INTO user_proxies (user_id,name,host,port,username,password,ptype,created_at)
+    VALUES (:uid,:name,:host,:port, NULLIF(:u,''), NULLIF(:p,''), :t,NOW())
+    ON CONFLICT (user_id, host, port) DO UPDATE SET name = EXCLUDED.name");
 
   foreach ($lines as $raw) {
     if ($ins >= $left) { $skip++; continue; } // stop adding beyond limit
