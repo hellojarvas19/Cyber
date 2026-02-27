@@ -7,9 +7,14 @@ require_once __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-$dsn  = $_ENV['DB_DSN'];
-$user = $_ENV['DB_USER'];
-$pass = $_ENV['DB_PASS'];
+$dsn  = $_ENV['DB_DSN'] ?? '';
+$user = $_ENV['DB_USER'] ?? '';
+$pass = $_ENV['DB_PASS'] ?? '';
+
+if (empty($dsn)) {
+    http_response_code(500);
+    die("❌ DB_DSN environment variable not set. Please configure environment variables in Railway dashboard.");
+}
 
 try {
     $pdo = new PDO($dsn, $user, $pass, [
