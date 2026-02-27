@@ -18,8 +18,6 @@ $pass = $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '';
 if (empty($dsn)) {
     http_response_code(500);
     echo "❌ DB_DSN environment variable not set.\n";
-    echo "Available env keys: " . implode(', ', array_keys($_ENV)) . "\n";
-    echo "getenv DB_DSN: " . (getenv('DB_DSN') ?: 'not set') . "\n";
     die();
 }
 
@@ -28,16 +26,18 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ]);
     
-    // Check if tables exist
-    $stmt = $pdo->query("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'users'");
-    $exists = $stmt->fetchColumn() > 0;
+    // Always run the schema to ensure all tables exist
+    $schema = file_get_contents(__DIR__ . '/schema.sql');
+    $pdo->exec($schema);
     
-    if ($exists) {
-        echo "✅ Database already set up!";
-    } else {
-        $schema = file_get_contents(__DIR__ . '/schema.sql');
-        $pdo->exec($schema);
-        echo "✅ Database schema created successfully!";
+    // Check what tables exist
+    $stmt = $pdo->query("SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename");
+    $tables = $stmt->fetchAll(PDO::FETCH_COLUMN);
+    
+    echo "✅ Database schema updated successfully!\n\n";
+    echo "Tables in database:\n";
+    foreach ($tables as $table) {
+        echo "  - $table\n";
     }
 } catch (Exception $e) {
     http_response_code(500);
