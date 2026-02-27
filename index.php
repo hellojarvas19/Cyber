@@ -5,7 +5,7 @@ require_once __DIR__ . '/app/Bootstrap.php';
 $botUsername   = $_ENV['TELEGRAM_BOT_USERNAME'] ?? ''; // without @
 $requireAllow  = filter_var($_ENV['TELEGRAM_REQUIRE_ALLOWLIST'] ?? 'false', FILTER_VALIDATE_BOOLEAN);
 $announceChat  = $_ENV['TELEGRAM_ANNOUNCE_CHAT_ID'] ?? '-1002552641928';
-$joinLink      = 'https://t.me/+iJQ1t3G4a4Q0NjI8';
+$joinLink      = 'https://t.me/+bS--8eZff1E0YTZl';
 
 // Maintenance: when allowlist is ON and not using staff link
 $maintenance = $requireAllow && !isset($_GET['admin']);
