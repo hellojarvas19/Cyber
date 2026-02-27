@@ -72,12 +72,12 @@ if ($lowCredits || $nearExpiry) {
 /* SSR lists for right column */
 $onlineSSR = $pdo->query("SELECT username, first_name, last_name, profile_picture, status
                           FROM users
-                          WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL 5 MINUTE)
+                          WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL '5 MINUTE')
                           ORDER BY last_activity DESC LIMIT 20")->fetchAll();
 
 $topSSR = $pdo->query("SELECT username, first_name, last_name, profile_picture, status,
                               (lives + charges) AS hits,
-                              (online_status='online' AND last_activity >= (NOW() - INTERVAL 5 MINUTE)) AS is_online
+                              (online_status='online' AND last_activity >= (NOW() - INTERVAL '5 MINUTE')) AS is_online
                        FROM users
                        ORDER BY hits DESC LIMIT 20")->fetchAll();
 

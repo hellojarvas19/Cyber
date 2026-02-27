@@ -16,7 +16,7 @@ try {
 
   $online_now = (int)$pdo->query("
     SELECT COUNT(*) FROM users
-    WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL 5 MINUTE)
+    WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL '5 MINUTE')
   ")->fetchColumn();
 
   $live  = (int)$row['live_cards'];

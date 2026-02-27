@@ -12,7 +12,7 @@ try{
   if ($scope === 'top') {
     $rows = $pdo->query("SELECT username, first_name, last_name, profile_picture, status,
                                 (lives+charges) AS hits,
-                                (online_status='online' AND last_activity >= (NOW() - INTERVAL 5 MINUTE)) AS is_online
+                                (online_status='online' AND last_activity >= (NOW() - INTERVAL '5 MINUTE')) AS is_online
                          FROM users ORDER BY hits DESC LIMIT ".$limit)->fetchAll(PDO::FETCH_ASSOC);
     $users = array_map(function($r){
       return [
@@ -30,9 +30,9 @@ try{
   // default: online
   $rows = $pdo->query("SELECT username, first_name, last_name, profile_picture, status
                        FROM users
-                       WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL 5 MINUTE)
+                       WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL '5 MINUTE')
                        ORDER BY last_activity DESC LIMIT ".$limit)->fetchAll(PDO::FETCH_ASSOC);
-  $count = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL 5 MINUTE)")->fetchColumn();
+  $count = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE online_status='online' AND last_activity >= (NOW() - INTERVAL '5 MINUTE')")->fetchColumn();
   $users = array_map(function($r){
     return [
       'username'  => $r['username'],
