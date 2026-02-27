@@ -58,27 +58,27 @@ if (!is_dir($customSessPath)) {
 }
 
 // ---------- INI + cookie params ----------
-ini_set('session.save_path', $customSessPath);
-ini_set('session.gc_maxlifetime', (string)$GC_MAXLIFETIME);
-ini_set('session.cookie_lifetime', (string)$COOKIE_LIFETIME);
-ini_set('session.use_strict_mode', '1');
-ini_set('session.use_only_cookies', '1');
-ini_set('session.sid_length', '48');
-ini_set('session.sid_bits_per_character', '6');
+if (!headers_sent()) {
+    @ini_set('session.save_path', $customSessPath);
+    @ini_set('session.gc_maxlifetime', (string)$GC_MAXLIFETIME);
+    @ini_set('session.cookie_lifetime', (string)$COOKIE_LIFETIME);
+    @ini_set('session.use_strict_mode', '1');
+    @ini_set('session.use_only_cookies', '1');
+    @ini_set('session.sid_bits_per_character', '6');
 
-session_name($SESSION_NAME);
-session_set_cookie_params([
-    'lifetime' => $COOKIE_LIFETIME,
-    'path'     => '/',
-    'domain'   => $COOKIE_DOMAIN,   // .cyborx.net
-    'secure'   => $isHttps,
-    'httponly' => true,
-    'samesite' => $SAMESITE,        // Lax | Strict | None(HTTPS)
-]);
+    session_name($SESSION_NAME);
+    session_set_cookie_params([
+        'lifetime' => $COOKIE_LIFETIME,
+        'path'     => '/',
+        'domain'   => $COOKIE_DOMAIN,   // .cyborx.net
+        'secure'   => $isHttps,
+        'httponly' => true,
+        'samesite' => $SAMESITE,        // Lax | Strict | None(HTTPS)
+    ]);
 
-// ---------- start session ----------
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
+    // ---------- start session ----------
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
 }
-
 
