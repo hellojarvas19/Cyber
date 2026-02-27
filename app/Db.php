@@ -12,9 +12,22 @@ final class Db
         $user = $_ENV['DB_USER'] ?? 'app_user';
         $pass = $_ENV['DB_PASS'] ?? 'change_me';
 
-        // PDO / pdo_mysql না থাকলে 500 (সাইলেন্ট)
-        if (!class_exists(\PDO::class) || (str_starts_with($dsn, 'mysql:') && !in_array('mysql', \PDO::getAvailableDrivers(), true))) {
-            // error_log('PDO or pdo_mysql not available');
+        // Detect driver type
+        $isPgsql = str_starts_with($dsn, 'pgsql:');
+        $isMysql = str_starts_with($dsn, 'mysql:');
+
+        // PDO check
+        if (!class_exists(\PDO::class)) {
+            http_response_code(500);
+            exit;
+        }
+
+        // Driver check
+        if ($isMysql && !in_array('mysql', \PDO::getAvailableDrivers(), true)) {
+            http_response_code(500);
+            exit;
+        }
+        if ($isPgsql && !in_array('pgsql', \PDO::getAvailableDrivers(), true)) {
             http_response_code(500);
             exit;
         }
@@ -26,7 +39,7 @@ final class Db
                 \PDO::ATTR_EMULATE_PREPARES   => false,
             ]);
 
-            if (str_starts_with($dsn, 'mysql:')) {
+            if ($isMysql) {
                 $pdo->exec("SET SESSION sql_mode='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
                 $pdo->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
             }
