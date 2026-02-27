@@ -25,9 +25,11 @@ if (is_file($envFile)) {
             $q = $v[0];
             if (str_ends_with($v, $q)) $v = substr($v, 1, -1);
         }
-        // Prefer $_ENV/$_SERVER to share within app without OS env
-        $_ENV[$k]    = $v;
-        $_SERVER[$k] = $v;
+        // Only set if not already in environment (Railway vars take precedence)
+        if (!isset($_ENV[$k])) {
+            $_ENV[$k]    = $v;
+            $_SERVER[$k] = $v;
+        }
         // DO NOT call putenv(): it may be disabled on this host
     }
 }

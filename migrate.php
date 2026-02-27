@@ -4,16 +4,23 @@
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+// Try to load .env if it exists
+if (file_exists(__DIR__ . '/.env')) {
+    $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->load();
+}
 
-$dsn  = $_ENV['DB_DSN'] ?? '';
-$user = $_ENV['DB_USER'] ?? '';
-$pass = $_ENV['DB_PASS'] ?? '';
+// Check both $_ENV and getenv() for Railway compatibility
+$dsn  = $_ENV['DB_DSN'] ?? getenv('DB_DSN') ?: '';
+$user = $_ENV['DB_USER'] ?? getenv('DB_USER') ?: '';
+$pass = $_ENV['DB_PASS'] ?? getenv('DB_PASS') ?: '';
 
 if (empty($dsn)) {
     http_response_code(500);
-    die("❌ DB_DSN environment variable not set. Please configure environment variables in Railway dashboard.");
+    echo "❌ DB_DSN environment variable not set.\n";
+    echo "Available env keys: " . implode(', ', array_keys($_ENV)) . "\n";
+    echo "getenv DB_DSN: " . (getenv('DB_DSN') ?: 'not set') . "\n";
+    die();
 }
 
 try {
