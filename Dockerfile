@@ -21,5 +21,5 @@ RUN composer install --no-dev --optimize-autoloader
 # Expose port
 EXPOSE 8080
 
-# Start PHP server
-CMD php -S 0.0.0.0:8080 -t .
+# Start PHP server with front controller
+CMD php -S 0.0.0.0:8080 server.php
