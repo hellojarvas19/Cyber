@@ -53,6 +53,15 @@ CREATE TABLE IF NOT EXISTS redeem_history (
     redeemed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS user_credit_claims (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    claim_date DATE NOT NULL,
+    amount INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(user_id, claim_date)
+);
+
 CREATE TABLE IF NOT EXISTS settings (
     key VARCHAR(64) PRIMARY KEY,
     val TEXT,
